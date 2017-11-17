@@ -3,6 +3,13 @@ import glob
 import time
 import datetime
 import sqlite3
+import RPi.GPIO as io
+
+io.setmode(io.BCM)
+
+fridge_door_pin = 13
+
+io.setup(fridge_door_pin, io.IN, pull_up_down = io.PUD_UP)
 
 os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
@@ -41,8 +48,13 @@ def save_temp(temp):
 	current_time = datetime.datetime.now();
 	date = current_time.strftime("%B %d, %Y")
 	time = current_time.time().isoformat()
-	insertion = [date, time, temp]
-	c.executemany('INSERT INTO beer_fridge (date, time, temp, state) VALUES (?, ?, ?, null)', (insertion,))
+	if io.input(fridge_door_pin):
+		state = 'Open'
+	else:
+		state = 'Closed'
+	print state
+	insertion = [date, time, temp, state]
+	c.executemany('INSERT INTO beer_fridge (date, time, temp, state) VALUES (?, ?, ?, ?)', (insertion,))
 	conn.commit()
 
 while True:
