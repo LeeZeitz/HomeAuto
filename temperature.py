@@ -42,7 +42,7 @@ def save_temp(temp):
 	date = current_time.strftime("%B %d, %Y")
 	time = current_time.time().isoformat()
 	insertion = [date, time, temp]
-	c.execute('INSERT INTO beer_fridge (date, time, temp, state) VALUES (?, ?, ?, null)', (insertion,))
+	c.executemany('INSERT INTO beer_fridge (date, time, temp, state) VALUES (?, ?, ?, null)', (insertion,))
 	conn.commit()
 
 while True:
